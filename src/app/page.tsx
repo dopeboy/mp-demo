@@ -1,113 +1,190 @@
-import Image from "next/image";
+"use client"
+import { useEffect, useState } from "react";
+import Spreadsheet, { Matrix } from "react-spreadsheet";
+
+import { MyResponsiveLine } from "./line";
+import { MyResponsiveBar } from "./bar";
+import Dropzone from "react-dropzone";
+
 
 export default function Home() {
+
+  const [showModal, setShowModal] = useState(false)
+  const [processing, setProcessing] = useState(false)
+
+  const [data, setData] = useState<Matrix<{ value: string, readOnly: boolean }>>([
+    [{ value: "", readOnly: false }, { value: "Q1", readOnly: false }, { value: "Q2", readOnly: false }, { value: "Q3", readOnly: false }, { value: "Q4", readOnly: false }],
+    [{ value: "Units Sold", readOnly: false }, { value: "1000", readOnly: false }, { value: "2000", readOnly: false }, { value: "4000", readOnly: false }, { value: "8000", readOnly: false }],
+    [{ value: "Total Sales", readOnly: false }, { value: "12000", readOnly: false }, { value: "24000", readOnly: false }, { value: "48000", readOnly: false }, { value: "96000", readOnly: false }],
+    [{ value: "Gross Margin", readOnly: false }, { value: "7000", readOnly: false }, { value: "14000", readOnly: false }, { value: "28000", readOnly: false }, { value: "56000", readOnly: false }],
+    [{ value: "Gross Margin %", readOnly: false }, { value: "58.33%", readOnly: false }, { value: "58.33%", readOnly: false }, { value: "58.33%", readOnly: false }, { value: "58.33%", readOnly: false }],
+    [{ value: "", readOnly: false }, { value: "", readOnly: false }, { value: "", readOnly: false }, { value: "", readOnly: false }, { value: "", readOnly: false }],
+    [{ value: "Total Operating Expenses", readOnly: false }, { value: "9000", readOnly: false }, { value: "9000", readOnly: false }, { value: "9000", readOnly: false }, { value: "9000", readOnly: false }],
+    [{ value: "Net Income", readOnly: false }, { value: "-2000", readOnly: false }, { value: "5000", readOnly: false }, { value: "19000", readOnly: false }, { value: "47000", readOnly: false }],
+    [{ value: "Net Margin %", readOnly: false }, { value: "-16.67%", readOnly: false }, { value: "-20.83%", readOnly: false }, { value: "39.58%", readOnly: false }, { value: "48.96%", readOnly: false }],
+  ])
+
+  const [assumptionsData, setAssumptionsData] = useState<Matrix<{ value: string, readOnly: boolean }>>([
+    [{ value: "Cost Per Unit", readOnly: false }, { value: "", readOnly: false }, { value: "", readOnly: false }, { value: "Total Cost Per Unit", readOnly: false }, { value: "5", readOnly: false }],
+    [{ value: "Beef", readOnly: false }, { value: "2", readOnly: false }, { value: "", readOnly: false }, { value: "Price Per Unit", readOnly: false }, { value: "12", readOnly: false }, { value: "", readOnly: false }, { value: "", readOnly: false }, { value: "3230", readOnly: false }],
+    [{ value: "Chicken", readOnly: false }, { value: "1", readOnly: false }, { value: "", readOnly: false }, { value: "Warehouse Rent per Quarter", readOnly: false }, { value: "9000", readOnly: false }],
+    [{ value: "Lettuce", readOnly: false }, { value: "1", readOnly: false }, { value: "", readOnly: false }, { value: "Units sold Q1", readOnly: false }, { value: "1000", readOnly: false }],
+    [{ value: "Labor", readOnly: false }, { value: "1", readOnly: false }, { value: "", readOnly: false }, { value: "Quarter-over-Quarter Growth", readOnly: false }, { value: "100%", readOnly: false }]
+  ])
+
+  const newAssumptionsData = [
+    [{ value: "Cost Per Unit", readOnly: false }, { value: "", readOnly: false }, { value: "", readOnly: false }, { value: "Total Cost Per Unit", readOnly: false }, { value: "7", readOnly: false }],
+    [{ value: "Beef", readOnly: false }, { value: "4", readOnly: false }, { value: "", readOnly: false }, { value: "Price Per Unit", readOnly: false }, { value: "14", readOnly: false }, { value: "", readOnly: false }, { value: "", readOnly: false }, { value: "3230", readOnly: false }],
+    [{ value: "Chicken", readOnly: false }, { value: "1", readOnly: false }, { value: "", readOnly: false }, { value: "Warehouse Rent per Quarter", readOnly: false }, { value: "9000", readOnly: false }],
+    [{ value: "Lettuce", readOnly: false }, { value: "1", readOnly: false }, { value: "", readOnly: false }, { value: "Units sold Q1", readOnly: false }, { value: "1000", readOnly: false }],
+    [{ value: "Labor", readOnly: false }, { value: "1", readOnly: false }, { value: "", readOnly: false }, { value: "Quarter-over-Quarter Growth", readOnly: false }, { value: "100%", readOnly: false }]
+  ]
+  
+  const newSalesData = [
+    [{ value: "", readOnly: false }, { value: "Q1", readOnly: false }, { value: "Q2", readOnly: false }, { value: "Q3", readOnly: false }, { value: "Q4", readOnly: false }],
+    [{ value: "Units Sold", readOnly: false }, { value: "1000", readOnly: false }, { value: "2000", readOnly: false }, { value: "4000", readOnly: false }, { value: "8000", readOnly: false }],
+    [{ value: "Total Sales", readOnly: false }, { value: "14000", readOnly: false }, { value: "28000", readOnly: false }, { value: "56000", readOnly: false }, { value: "112000", readOnly: false }],
+    [{ value: "Total COGS", readOnly: false }, { value: "7000", readOnly: false }, { value: "14000", readOnly: false }, { value: "28000", readOnly: false }, { value: "56000", readOnly: false }],
+    [{ value: "Gross Margin", readOnly: false }, { value: "7000", readOnly: false }, { value: "14000", readOnly: false }, { value: "28000", readOnly: false }, { value: "56000", readOnly: false }],
+    [{ value: "Gross Margin %", readOnly: false }, { value: "50.00%", readOnly: false }, { value: "50.00%", readOnly: false }, { value: "50.00%", readOnly: false }, { value: "50.00%", readOnly: false }],
+    [{ value: "", readOnly: false }, { value: "", readOnly: false }, { value: "", readOnly: false }, { value: "", readOnly: false }, { value: "", readOnly: false }],
+    [{ value: "Total Operating Expenses", readOnly: false }, { value: "9000", readOnly: false }, { value: "9000", readOnly: false }, { value: "9000", readOnly: false }, { value: "9000", readOnly: false }],
+    [{ value: "Net Income", readOnly: false }, { value: "-2000", readOnly: false }, { value: "5000", readOnly: false }, { value: "19000", readOnly: false }, { value: "47000", readOnly: false }],
+    [{ value: "Net Margin %", readOnly: false }, { value: "-14.29%", readOnly: false }, { value: "17.86%", readOnly: false }, { value: "33.93%", readOnly: false }, { value: "41.96%", readOnly: false }],
+  ]
+
+  useEffect(() => {
+  }, [data])
+
+  const getTotalSalesData = () => {
+    let d = []
+
+    for (const i in data) {
+      if (data[i][0].value == "Total Sales") {
+        for (let j = 1; j < data[i].length; ++j) {
+          d.push(
+            { "x": (j - 1) * 4, "y": parseFloat(data[i][j].value.replace(/,/g, '')) }
+          )
+        }
+      }
+    }
+
+    return d
+  }
+
+  const getBarData = () => {
+    let d = []
+    for (let j = 1; j < 5; ++j) {
+      let z = {}
+      for (let i = 0; i < 9; ++i) {
+        console.log(111, i, j, data[i][j])
+        if (i == 0) {
+          z["Period"] = data[i][j].value
+        }
+
+        else if (i == 2) {
+          z["Total Sales"] = parseFloat(data[i][j].value.replace(/,/g, ''))
+        }
+
+        else if (i == 3) {
+          z["Gross Margin"] = parseFloat(data[i][j].value.replace(/,/g, ''))
+        }
+
+        else if (i == 7) {
+          z["Net Income"] = parseFloat(data[i][j].value.replace(/,/g, ''))
+        }
+      }
+      d.push(z)
+    }
+
+    return d
+  }
+
+  const lineData =
+    [
+      {
+        "id": "Total Sales",
+        "color": "hsl(43, 70%, 50%)",
+        "data": getTotalSalesData()
+      }
+    ]
+
+  const barData = getBarData()
+
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      <div className="z-10 w-full max-w-5xl items-center justify-between font-mono text-sm lg:flex">
-        <p className="fixed left-0 top-0 flex w-full justify-center border-b border-gray-300 bg-gradient-to-b from-zinc-200 pb-6 pt-8 backdrop-blur-2xl dark:border-neutral-800 dark:bg-zinc-800/30 dark:from-inherit lg:static lg:w-auto  lg:rounded-xl lg:border lg:bg-gray-200 lg:p-4 lg:dark:bg-zinc-800/30">
-          Get started by editing&nbsp;
-          <code className="font-mono font-bold">src/app/page.tsx</code>
-        </p>
-        <div className="fixed bottom-0 left-0 flex h-48 w-full items-end justify-center bg-gradient-to-t from-white via-white dark:from-black dark:via-black lg:static lg:size-auto lg:bg-none">
-          <a
-            className="pointer-events-none flex place-items-center gap-2 p-8 lg:pointer-events-auto lg:p-0"
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{" "}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className="dark:invert"
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
+    <div className="container mx-auto p-4">
+      <div className={`${showModal ? 'blur-sm' : ''}`}>
+        <button onClick={() => setShowModal(true)} data-modal-target="default-modal" data-modal-toggle="default-modal" class="mx-auto block text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" type="button">
+          Upload ✨
+        </button>
+        <div className="mt-4 grid grid-cols-2 gap-8">
+          <div>
+            <h2 className="mb-4 text-2xl font-bold">Assumptions</h2>
+            <Spreadsheet data={assumptionsData} onChange={setAssumptionsData as (data: Matrix<{ value: string; }>) => void} />
+            <h2 className="my-4 text-2xl font-bold">Profit and Loss at a Glance</h2>
+            <Spreadsheet data={data} onChange={setData as (data: Matrix<{ value: string; }>) => void} />
+          </div>
+          <div>
+            <div className="">
+              <h2 className="mb-4 text-2xl font-bold">Monthly Sales Forecast</h2>
+              <div style={{ height: "400px" }} className="ml-[-0px] mt-[-40px]">
+                <MyResponsiveLine
+                  data={lineData}
+                />
+              </div>
+              <h2 className="my-2 text-2xl font-bold">Quarterly Sales, Gross Margin, Net Profit</h2>
+              <div style={{ height: "400px" }} className="ml-[-8px] mt-[-40px]">
+                <MyResponsiveBar
+                  data={barData}
+                />
+              </div>
+            </div>
+          </div>
         </div>
       </div>
-
-      <div className="relative z-[-1] flex place-items-center before:absolute before:h-[300px] before:w-full before:-translate-x-1/2 before:rounded-full before:bg-gradient-radial before:from-white before:to-transparent before:blur-2xl before:content-[''] after:absolute after:-z-20 after:h-[180px] after:w-full after:translate-x-1/3 after:bg-gradient-conic after:from-sky-200 after:via-blue-200 after:blur-2xl after:content-[''] before:dark:bg-gradient-to-br before:dark:from-transparent before:dark:to-blue-700 before:dark:opacity-10 after:dark:from-sky-900 after:dark:via-[#0141ff] after:dark:opacity-40 sm:before:w-[480px] sm:after:w-[240px] before:lg:h-[360px]">
-        <Image
-          className="relative dark:drop-shadow-[0_0_0.3rem_#ffffff70] dark:invert"
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
-      </div>
-
-      <div className="mb-32 grid text-center lg:mb-0 lg:w-full lg:max-w-5xl lg:grid-cols-4 lg:text-left">
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className="mb-3 text-2xl font-semibold">
-            Docs{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className="m-0 max-w-[30ch] text-sm opacity-50">
-            Find in-depth information about Next.js features and API.
-          </p>
-        </a>
-
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className="mb-3 text-2xl font-semibold">
-            Learn{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className="m-0 max-w-[30ch] text-sm opacity-50">
-            Learn about Next.js in an interactive course with&nbsp;quizzes!
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className="mb-3 text-2xl font-semibold">
-            Templates{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className="m-0 max-w-[30ch] text-sm opacity-50">
-            Explore starter templates for Next.js.
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className="mb-3 text-2xl font-semibold">
-            Deploy{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className="m-0 max-w-[30ch] text-balance text-sm opacity-50">
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
-      </div>
-    </main>
+      {showModal && (
+        <div id="static-modal" data-modal-backdrop="static" tabindex="-1" aria-hidden="true" class="flex items-center justify-center h-screen overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
+          <div class="relative p-4 w-full max-w-2xl max-h-full">
+            <div class="relative bg-white rounded-lg shadow ">
+              <div class="flex items-center justify-between p-4 md:p-5 border-b rounded-t ">
+                <h3 class="text-xl font-semibold text-gray-900">
+                  Upload
+                </h3>
+                <button onClick={() => setShowModal(false)} type="button" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white" data-modal-hide="static-modal">
+                  <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6" />
+                  </svg>
+                  <span class="sr-only">Close modal</span>
+                </button>
+              </div>
+              <div class="p-4 md:p-5 space-y-4">
+                {!processing && (
+                  <Dropzone onDrop={acceptedFiles => { setProcessing(true); setTimeout(() => {setAssumptionsData(newAssumptionsData); setData(newSalesData); setShowModal(false); setProcessing(false)}, 5000) }}>
+                    {({ getRootProps, getInputProps }) => (
+                      <section>
+                        <div {...getRootProps()}>
+                          <input {...getInputProps()} />
+                          <p>Drag a research report, supplier quote, etc here</p>
+                        </div>
+                      </section>
+                    )}
+                  </Dropzone>
+                )}
+                {processing && (
+                  <div className="flex flex-rows items-center">
+                    <iframe src="https://giphy.com/embed/zPbnEgxsPJOJSD3qfr" width="150" height="150" frameBorder="0" class="giphy-embed" allowFullScreen></iframe>
+                    <iframe src="https://giphy.com/embed/2bYewTk7K2No1NvcuK" width="150" height="150" frameBorder="0" class="ml-4" allowFullScreen></iframe>
+                    <iframe src="https://giphy.com/embed/gIhgev1w5UVjDj25Ul" width="150" height="150" frameBorder="0" class="ml-4" allowFullScreen></iframe>
+                  </div>
+                )}
+              </div>
+              <div class="flex items-center p-4 md:p-5 border-t border-gray-200 rounded-b ">
+                <button onClick={() => setShowModal(false)} data-modal-hide="static-modal" type="button" class="py-2.5 px-5 ms-3 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-100">Close</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
   );
 }
